@@ -27,11 +27,13 @@ gmail = oauth.remote_app(
 
 
 @app.route('/',methods=['GET', 'POST'])
-def hello():
+def getInput():
     if request.method == 'GET':
         return render_template('index.html')
-    elif request.method == 'POST':
-        return render_template('index.html',result=request.form['input'])
+    if request.method == 'POST':
+        session['keyword']=request.form["input"]
+        #return render_template('index.html', word= request.form["input"])
+        return redirect(url_for('login', _external=True))
 
 
 
@@ -47,7 +49,7 @@ def authorized(resp):
     user = gmail.get('userinfo') 
     session['user_email'] = user.data['email']
     session['user_id'] = user.data['id']
-    #return jsonify({"data": user.data})
+    #return redirect(url_for('getInput'))
     return redirect(url_for('requestEmails', _external=True))
 
 @gmail.tokengetter
@@ -56,7 +58,7 @@ def get_google_oauth_token():
 
 @app.route('/request_emails')
 def requestEmails():
-    #query=' ' 
+    query=session['keyword']
     uId = session.get('user_id') 
     url = 'https://www.googleapis.com/gmail/v1/users/'+uId+'/messages' 
     response = gmail.get(url, data = {'maxResults': 10}) 
