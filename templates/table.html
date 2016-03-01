@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+    <title>Inbox Parser</title>
+</head>
+<body>
+    <h1>Results</h1>
+
+    <table>
+        <tr>
+        <th>Email</th>
+        <th>Count</th>		
+        </tr>
+        {% for key in count %}
+        <tr>
+        <td>{{ key }}</td>
+        <td>{{ count[key] }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</body>
+</html>

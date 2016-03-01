@@ -2,7 +2,9 @@
 #pip install flask-oauthlib first
 from flask_oauthlib.client import OAuth
 from flask import Flask, redirect, url_for, session, request, jsonify, render_template
-import requests
+import re
+
+#TODO: logout, data flow, make templates, better regex
 
 app = Flask(__name__)
 app.config['GOOGLE_ID'] = "ID"
@@ -12,7 +14,6 @@ app.secret_key = 'development'
 oauth = OAuth(app)
 
 
-#/ and no / makes a huge difference...
 gmail = oauth.remote_app(
     'gmail', 
     consumer_key=app.config.get('GOOGLE_ID'), 
@@ -26,13 +27,14 @@ gmail = oauth.remote_app(
 )
 
 
+#displays the index.html page
 @app.route('/',methods=['GET', 'POST'])
 def getInput():
     if request.method == 'GET':
         return render_template('index.html')
     if request.method == 'POST':
         session['keyword']=request.form["input"]
-        #return render_template('index.html', word= request.form["input"])
+        #if form is submitted, takes user to authentication page
         return redirect(url_for('login', _external=True))
 
 
@@ -61,6 +63,7 @@ def requestEmails():
     query=session['keyword']
     uId = session.get('user_id') 
     url = 'https://www.googleapis.com/gmail/v1/users/'+uId+'/messages' 
+    #limits to 10 emails
     response = gmail.get(url, data = {'maxResults': 10}) 
     data = response.data
     return getContent(data['messages'])
@@ -75,13 +78,26 @@ def getContent(messages):
         #alternative approach
         url = 'https://www.googleapis.com/gmail/v1/users/'+uId+'/messages/'+messageId+'?format=metadata&metadataHeaders=From&&metadataHeaders=To&&metadataHeaders=Date'
         result=gmail.get(url)
-        #print result
         d[messageId]=result.data
-    return jsonify(d)
+    count=processData(d)    
+    return render_template('table.html', count=count);
     
     
-        
-
+#counts emails        
+def processData(dic):
+    result={}
+    for i in dic:
+        #from field
+        person=dic[i]['payload']['headers'][1]['value']
+        #need to fix regex
+        eList=re.findall('([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+[a-zA-Z0-9-]+)',person)
+        for e in eList:
+            if e not in result:
+                result[e]=1
+            else:
+                result[e]+=1
+    return result
+    
 if __name__ == '__main__':
     app.debug = True
     app.run()
