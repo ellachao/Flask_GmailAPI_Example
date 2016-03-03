@@ -4,7 +4,7 @@ from flask_oauthlib.client import OAuth
 from flask import Flask, redirect, url_for, session, request, jsonify, render_template
 import re
 
-#TODO: logout, data flow, make templates, better regex
+#TODO: logout, data flow, make templates, better regex, redirect to first page
 
 app = Flask(__name__)
 app.config['GOOGLE_ID'] = "ID"
@@ -61,11 +61,14 @@ def get_google_oauth_token():
 @app.route('/request_emails')
 def requestEmails():
     query=session['keyword']
+    print query
     uId = session.get('user_id') 
     url = 'https://www.googleapis.com/gmail/v1/users/'+uId+'/messages' 
     #limits to 10 emails
-    response = gmail.get(url, data = {'maxResults': 10}) 
+    response = gmail.get(url, data = {'q':query,'maxResults': 10}) 
     data = response.data
+    if data['resultSizeEstimate']==0:
+            return render_template('table.html', r=True)
     return getContent(data['messages'])
     
 @app.route('/get_content')
@@ -97,6 +100,8 @@ def processData(dic):
             else:
                 result[e]+=1
     return result
+
+
     
 if __name__ == '__main__':
     app.debug = True

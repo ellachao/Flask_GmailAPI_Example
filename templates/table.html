@@ -5,10 +5,12 @@
 </head>
 <body>
     <h1>Results</h1>
-
+{% if r %}
+    <h2>No result found</h2>
+{% else %}
     <table>
         <tr>
-        <th>Email</th>
+        <th>Sent From</th>
         <th>Count</th>		
         </tr>
         {% for key in count %}
@@ -17,7 +19,8 @@
         <td>{{ count[key] }}</td>
         </tr>
         {% endfor %}
-
+{% endif %}
     </table>
+    <!--<input type="submit" name="again" value="Try Again!">-->
 </body>
 </html>
