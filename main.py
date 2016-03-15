@@ -7,8 +7,8 @@ import re
 #TODO: logout, data flow, make templates, better regex, redirect to first page
 
 app = Flask(__name__)
-app.config['GOOGLE_ID'] = "ID"
-app.config['GOOGLE_SECRET'] = "SECRET"
+app.config['GOOGLE_ID'] = "862465488255-9chnq8bhb8lekt8hijpkj33u845hjc6n.apps.googleusercontent.com"
+app.config['GOOGLE_SECRET'] = "iB-UStqmJV0EOmQVX-NIC_VZ"
 app.debug = True
 app.secret_key = 'development'
 oauth = OAuth(app)
@@ -34,8 +34,11 @@ def getInput():
         return render_template('index.html')
     if request.method == 'POST':
         session['keyword']=request.form["input"]
-        #if form is submitted, takes user to authentication page
-        return redirect(url_for('login', _external=True))
+        if 'user_id' not in session:
+            #if form is submitted, takes user to authentication page
+            return redirect(url_for('login', _external=True))
+        else:
+            return redirect(url_for('requestEmails', _external=True))
 
 
 
