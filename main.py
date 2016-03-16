@@ -7,8 +7,8 @@ import re
 #TODO: logout, data flow, make templates, better regex, redirect to first page
 
 app = Flask(__name__)
-app.config['GOOGLE_ID'] = "862465488255-9chnq8bhb8lekt8hijpkj33u845hjc6n.apps.googleusercontent.com"
-app.config['GOOGLE_SECRET'] = "iB-UStqmJV0EOmQVX-NIC_VZ"
+app.config['GOOGLE_ID'] = "ID"
+app.config['GOOGLE_SECRET'] = "SECRET"
 app.debug = True
 app.secret_key = 'development'
 oauth = OAuth(app)
